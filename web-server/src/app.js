@@ -55,6 +55,15 @@ app.get('/weather', (req, res) => {
   });
 });
 
+app.get('/products', (req, res) => {
+  if (!req.query.search) {
+    return res.send({
+      error: 'You must provide a search term',
+    });
+  }
+  res.send({ products: [] });
+});
+
 app.get('*', (req, res) => {
   res.render('404', {
     page_title: 'Error Page',
@@ -65,3 +74,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(3000, () => console.log('server started at port 3000'));
+
+// const viewsPath = path.join(__dirname, '../views');
+// app.set('views', viewsPath);
