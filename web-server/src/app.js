@@ -4,17 +4,27 @@ const express = require('express');
 const hbs = require('hbs');
 const dotenv = require('dotenv').config();
 
-// console.log(process.env.test);
+const getGeoCode = require('../utils/geocode');
+const getForecast = require('../utils/forecast');
+
 const app = express();
 // configure paths
 const publicDirPath = path.join(__dirname, '../public');
 const viewsPath = path.join(__dirname, '../templates/views');
 const partialsPath = path.join(__dirname, '../templates/partials');
 
+// serve static files
 app.use(express.static(publicDirPath));
+
+// setup view engine
 app.set('view engine', 'hbs');
 app.set('views', viewsPath);
+
+// register partials
 hbs.registerPartials(partialsPath);
+
+// test env variables
+// console.log(process.env.MAPBOX_APIKEY);
 
 app.get('/', (req, res) => {
   res.render('index', {
@@ -44,24 +54,52 @@ app.get('/help/*', (req, res) => {
   res.send('<h1> Article not found </h1> ');
 });
 
-app.get('/weather', (req, res) => {
-  res.send({
-    location: 'kathmandu',
-    forecast: {
-      temperature: 22,
-      feelslike: 21,
-      precip: 0,
-    },
-  });
-});
-
-app.get('/products', (req, res) => {
-  if (!req.query.search) {
+app.get('/weather', async (req, res) => {
+  const address = req.query.address;
+  if (!address) {
     return res.send({
-      error: 'You must provide a search term',
+      error: 'Please provide a address ',
     });
   }
-  res.send({ products: [] });
+
+  try {
+    const {
+      data: { features },
+    } = await getGeoCode(address);
+    if (features.length === 0) {
+      res.send({ status: 200, error: 'Address not found' });
+    }
+    const [longitude, latitude] = features[0].center;
+    const {
+      data: { location, current },
+    } = await getForecast(longitude, latitude);
+
+    res.send({ status: 200, data: { location, current } });
+  } catch (error) {
+    res.send({ status: error.status, message: error.message });
+  }
+
+  // getGeoCode(address)
+  //   .then((response) => {
+  //     return new Promise((resolve, reject) => {
+  //       const { features } = response.data;
+  //       if (features.length === 0) {
+  //         reject({ status: 200, error: 'Address not found' });
+  //       }
+  //       const [latitude, longitude] = features[0];
+  //       resolve({ status: 200, data: { latitude, longitude } });
+  //     });
+  //   })
+  //   .then((response) => {
+  //     console.log(response);
+  //     const { latitude, longitude } = response;
+  //     getForecast(longitude, latitude)
+  //       .then((response) => {
+  //         console.log(response);
+  //       })
+  //       .catch((error) => res.send({ status: 200, error: error.message }));
+  //   })
+  //   .catch((error) => res.send(error));
 });
 
 app.get('*', (req, res) => {
@@ -74,6 +112,3 @@ app.get('*', (req, res) => {
 });
 
 app.listen(3000, () => console.log('server started at port 3000'));
-
-// const viewsPath = path.join(__dirname, '../views');
-// app.set('views', viewsPath);
