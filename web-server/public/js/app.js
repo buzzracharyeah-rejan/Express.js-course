@@ -27,7 +27,7 @@ if (form) {
     message2.innerHTML = '<h4>Loading... </h4>';
     const address = search.value;
     if (address.trim().length !== 0) {
-      fetch(`http://localhost:3000/weather?address=${address}`)
+      fetch(`/weather?address=${address}`)
         .then((response) => {
           response.json().then((data) => {
             if (data.error) {
@@ -44,8 +44,8 @@ if (form) {
                 },
                 location: { country, region },
               } = data.data;
-              const message = `It is ${temperature} degree fahrenhiet, feels like ${feelslike}. The weather is ${weather_descriptions[0]} and has ${precip}% chance of rain`;
-              const location = `${region}, ${country}`;
+              const message = `It is ${temperature} degree celcius, feels like ${feelslike}. The weather is ${weather_descriptions[0]} and has ${precip}% chance of rain`;
+              const location = `${address}, ${region}, ${country}`;
 
               message1.innerHTML = `${message} <br /> ${location}`;
               message2.textContent = '';

@@ -54,9 +54,9 @@ h1 {
 
 .main-content > div {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .portrait {
   width: 250px;
@@ -71,4 +71,20 @@ footer {
   border-top: 1px solid #eee;
   margin-top: 1rem;
   padding: 1rem 0;
+}
+
+button {
+  padding: 0.25rem 1.25rem;
+  text-align: center;
+  background: #f2f2f2;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover,
+button:active {
+  cursor: pointer;
+  background: #f4f4f4;
+  color: #888;
+  margin-bottom: 1px solid #000;
 }
